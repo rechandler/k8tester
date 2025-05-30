@@ -12,6 +12,8 @@ env:
   ENVIRONMENT: stage
   GCP_PROJECT_ID: previewbuild
   GAR_LOCATION: us-central1
+  REPOSITORY: preview-build
+  SERVICE: preview-build
 
 jobs:
   deploy:
