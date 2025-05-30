@@ -26,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Google Auth
+      - name: Auth to GCP
         id: auth
         uses: "google-github-actions/auth@v2"
         with:
@@ -34,11 +34,9 @@ jobs:
 
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v2"
-
-      - name: "Install GKE auth plugin"
-        run: |-
-          gcloud components install gke-gcloud-auth-plugin --quiet
-          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          install_components: "gke-gcloud-auth-plugin"
 
       - name: "Use gcloud CLI"
         run: "gcloud info"
