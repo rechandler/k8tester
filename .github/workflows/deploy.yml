@@ -12,7 +12,7 @@ env:
   ENVIRONMENT: stage
   GCP_PROJECT_ID: previewbuild
   GAR_LOCATION: us-central1
-  REPOSITORY: preview-build
+  REPOSITORY: ryann-repo
   SERVICE: preview-build
 
 jobs:
