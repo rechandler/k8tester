@@ -13,7 +13,6 @@ env:
   GCP_PROJECT_ID: previewbuild
   GAR_LOCATION: us-central1
 
-
 jobs:
   deploy:
     permissions:
