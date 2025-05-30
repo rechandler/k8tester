@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: preview-proxy
-          image: us-central1-docker.pkg.dev/pano-cam-dev/preview-proxy/preview-proxy:latest
+          image: nginx:alpine
           ports:
             - containerPort: 80
               name: http
@@ -30,6 +30,10 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
           livenessProbe:
             httpGet:
               path: /health
@@ -42,3 +46,7 @@ spec:
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 5
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config

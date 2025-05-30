@@ -22,13 +22,3 @@ spec:
                 name: preview-proxy-service
                 port:
                   number: 80
-    - host: "preview.pano.ai"
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: preview-proxy-service
-                port:
-                  number: 80
