@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: preview-proxy-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: preview-proxy-test
+  namespace: preview-proxy-test
+  labels:
+    app: preview-proxy-test
+    environment: test
+spec:
+  replicas: 1 # Just 1 replica for testing
+  selector:
+    matchLabels:
+      app: preview-proxy-test
+  template:
+    metadata:
+      labels:
+        app: preview-proxy-test
+        environment: test
+    spec:
+      containers:
+        - name: preview-proxy
+          image: us-central1-docker.pkg.dev/pano-cam-dev/preview-proxy/preview-proxy:latest
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              memory: "128Mi" # Lower resources for testing
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: preview-proxy-test-service
+  namespace: preview-proxy-test
+  labels:
+    app: preview-proxy-test
+    environment: test
+spec:
+  selector:
+    app: preview-proxy-test
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+  type: ClusterIP

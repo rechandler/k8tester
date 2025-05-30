@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: preview-proxy-ingress-http
+  namespace: default
+  labels:
+    app: preview-proxy
+    environment: stage
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "preview-proxy-ip"
+    kubernetes.io/ingress.allow-http: "true"
+spec:
+  rules:
+    - host: "*.preview.pano.ai"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: preview-proxy-service
+                port:
+                  number: 80
+    - host: "preview.pano.ai"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: preview-proxy-service
+                port:
+                  number: 80
