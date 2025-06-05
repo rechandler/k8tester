@@ -66,4 +66,4 @@ jobs:
           echo "Ingress info:"
           kubectl get ingress preview-proxy-ingress -n preview-proxy-ns
           echo "Certificate status:"
-          kubectl describe managedcertificate preview-wildcard-ssl -n preview-proxy-ns
+          kubectl describe managedcertificate preview-wildcard-cert -n preview-proxy-ns
