@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: preview-proxy-service
-  namespace: default
+  namespace: preview-proxy-ns
   labels:
     app: preview-proxy
     environment: stage

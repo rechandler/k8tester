@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: preview-proxy-ns
+  labels:
+    env: stage
+    owner: fe
+    system: preview-proxy
+    app: preview-proxy
+data:
+  nginx.conf: |
+    server {
+        listen 80 default_server;
+        server_name _;
+
+        # Health check endpoint
+        location = /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+
+        # Return 404 for all other requests to the default server
+        location / {
+            return 404;
+        }
+    }
+
+    map $pr_number $base_pr_number {
+        "~^(?<base>\d+)-pfo$" $base;
+        "~^(?<base>\d+)$" $base;
+    }
+
+    map $pr_number $dir {
+        "~^(?<base>\d+)-pfo$" "wildfirewatch";
+        "~^(?<base>\d+)$" "pano360";
+    }
+
+    server {
+        listen 80;
+        server_name ~^(?<pr_number>(\d+|\d+-pfo))\.fe\.preview\.pano\.ai$;
+
+        set $bucket_name "fe-usc1-pr-previews";
+
+        # Common settings for all locations
+        resolver 8.8.8.8;
+        proxy_intercept_errors on;
+        proxy_redirect off;
+        proxy_set_header Host storage.googleapis.com;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Custom error page for 404 - fallback to index.html
+        error_page 404 = @not_found;
+
+        # Named location for fallback handling
+        location @not_found {
+            proxy_pass https://storage.googleapis.com/$bucket_name/$base_pr_number/$dir/index.html;
+        }
+
+        # For root path (/) only
+        location = / {
+            proxy_pass https://storage.googleapis.com/$bucket_name/$base_pr_number/$dir/index.html;
+        }
+
+        # For all other requests
+        location / {
+            proxy_pass https://storage.googleapis.com/$bucket_name/$base_pr_number/$dir$request_uri;
+        }
+    }

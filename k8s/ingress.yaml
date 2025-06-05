@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: preview-proxy-ingress
+  namespace: preview-proxy-ns
+  labels:
+    app: preview-proxy
+    environment: stage
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "preview-proxy-ip"
+    kubernetes.io/ingress.allow-http: "false"
+    networking.gke.io/managed-certificates: preview-wildcard-cert
+    networking.gke.io/v1beta1.FrontendConfig: "preview-frontend-config"
+spec:
+  defaultBackend:
+    service:
+      name: preview-proxy-service
+      port:
+        number: 80

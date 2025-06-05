@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: preview-wildcard-cert
+  namespace: preview-proxy-ns
+spec:
+  domains:
+    - "foo.fe.preview.pano.ai"

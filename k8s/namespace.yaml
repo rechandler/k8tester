@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: preview-proxy-ns
+  labels:
+    env: stage
+    owner: fe
+    system: preview-proxy
+    app: preview-proxy

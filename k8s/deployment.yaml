@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: preview-proxy
-  namespace: default
+  namespace: preview-proxy-ns
   labels:
     app: preview-proxy
     environment: stage

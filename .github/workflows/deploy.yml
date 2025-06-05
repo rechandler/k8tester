@@ -11,9 +11,6 @@ env:
   CLUSTER_NAME: test-cluster
   ENVIRONMENT: stage
   GCP_PROJECT_ID: previewbuild
-  GAR_LOCATION: us-central1
-  REPOSITORY: ryann-repo
-  SERVICE: preview-build
 
 jobs:
   deploy:
@@ -26,9 +23,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Auth to GCP
-        id: auth
-        uses: "google-github-actions/auth@v2"
+      - name: "Auth to GCP"
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
 
@@ -45,23 +41,22 @@ jobs:
         run: |-
           gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --region ${{ env.REGION }} --project ${{ env.GCP_PROJECT_ID }}
 
-      - name: Create ConfigMap from nginx.conf
-        run: |-
-          kubectl create configmap nginx-config \
-            --from-file=default.conf=nginx.conf \
-            --dry-run=client -o yaml | kubectl apply -f -
-
       - name: Deploy to GKE
         run: |-
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/managed-certificate.yaml
+          kubectl apply -f k8s/frontend-config.yaml
+          kubectl apply -f k8s/nginx-config.yaml
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
-          kubectl apply -f k8s/ingress-http-only.yaml
+          kubectl apply -f k8s/ingress.yaml
 
       - name: Verify deployment
         run: |-
           kubectl rollout status deployment/preview-proxy --timeout=300s
           kubectl get services
           kubectl get ingress
+          kubectl get managedcertificate
 
       - name: Show deployment info
         run: |-
@@ -69,4 +64,6 @@ jobs:
           echo "Service status:"
           kubectl get deployment preview-proxy
           echo "Ingress info:"
-          kubectl get ingress preview-proxy-ingress-http
+          kubectl get ingress preview-proxy-ingress
+          echo "Certificate status:"
+          kubectl describe managedcertificate preview-wildcard-ssl
