@@ -53,17 +53,17 @@ jobs:
 
       - name: Verify deployment
         run: |-
-          kubectl rollout status deployment/preview-proxy --timeout=300s
-          kubectl get services
-          kubectl get ingress
-          kubectl get managedcertificate
+          kubectl rollout status deployment/preview-proxy -n preview-proxy-ns --timeout=300s
+          kubectl get services -n preview-proxy-ns
+          kubectl get ingress -n preview-proxy-ns
+          kubectl get managedcertificate -n preview-proxy-ns
 
       - name: Show deployment info
         run: |-
           echo "Deployment completed successfully!"
           echo "Service status:"
-          kubectl get deployment preview-proxy
+          kubectl get deployment preview-proxy -n preview-proxy-ns
           echo "Ingress info:"
-          kubectl get ingress preview-proxy-ingress
+          kubectl get ingress preview-proxy-ingress -n preview-proxy-ns
           echo "Certificate status:"
-          kubectl describe managedcertificate preview-wildcard-ssl
+          kubectl describe managedcertificate preview-wildcard-ssl -n preview-proxy-ns
